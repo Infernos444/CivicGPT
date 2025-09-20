@@ -5,6 +5,9 @@ import {
   TwitterOutlined,
   GithubOutlined,
   MailOutlined,
+  RocketOutlined,
+  CodeOutlined,
+  TeamOutlined,
 } from "@ant-design/icons";
 import { motion } from "framer-motion";
 
@@ -15,118 +18,229 @@ const FooterSection = () => {
   const socialLinks = [
     {
       icon: <LinkedinOutlined />,
-      url: "https://linkedin.com/company/insurely",
+      url: "https://linkedin.com/company/evalai",
       color: "#0A66C2",
     },
     {
       icon: <TwitterOutlined />,
-      url: "https://twitter.com/insurely",
+      url: "https://twitter.com/evalai",
       color: "#1DA1F2",
     },
     {
       icon: <GithubOutlined />,
-      url: "https://github.com/insurely",
+      url: "https://github.com/evalai",
       color: "#000000",
     },
     {
       icon: <MailOutlined />,
-      url: "mailto:support@insurely.com",
+      url: "mailto:support@evalai.com",
       color: "#FFB703",
     },
   ];
 
+  const scrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (section) {
+      section.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
+  const navigateToLogin = () => {
+    // This would typically use React Router navigation
+    window.location.href = "/login";
+  };
+
   return (
     <Footer
       style={{
-        background: "#1F2937",
+        background: "linear-gradient(135deg, #1F2937 0%, #0f172a 100%)",
         color: "#E0E0E0",
-        padding: "60px 20px 20px",
+        padding: "80px 20px 30px",
+        borderTop: "1px solid rgba(0, 255, 209, 0.1)",
       }}
     >
-      <Row justify="space-between" gutter={[32, 32]}>
-        <Col xs={24} md={12}>
-          <Title
-            level={3}
-            style={{
-              color: "#00FFD1",
-              fontWeight: 700,
-              marginBottom: 12,
-            }}
+      <Row justify="space-between" gutter={[48, 48]}>
+        <Col xs={24} md={8}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            INSURELY
-          </Title>
-          <Text style={{ color: "#E0E0E0" }}>
-            Empowering patients with smarter, more transparent insurance tools.
-            Your bill. Your rights. Your clarity.
-          </Text>
+            <Space direction="vertical" size="middle">
+              <Title
+                level={3}
+                style={{
+                  color: "#00FFD1",
+                  fontWeight: 700,
+                  margin: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <RocketOutlined />
+                EvalAI
+              </Title>
+              <Text style={{ color: "#E0E0E0", lineHeight: 1.6 }}>
+                From Coursework to Capstone: AI-Powered Project Evaluation. 
+                Generate meaningful projects and receive instant, expert-level feedback. 
+                Scale hands-on learning like never before.
+              </Text>
+              <Space size="middle" style={{ marginTop: 16 }}>
+                {socialLinks.map((social, index) => (
+                  <motion.div
+                    key={index}
+                    whileHover={{ scale: 1.1, y: -2 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button
+                      type="text"
+                      href={social.url}
+                      target="_blank"
+                      icon={social.icon}
+                      style={{
+                        background: "rgba(255, 255, 255, 0.1)",
+                        color: "#fff",
+                        borderRadius: "50%",
+                        width: 45,
+                        height: 45,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        padding: 0,
+                        border: `1px solid ${social.color}30`,
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </Space>
+            </Space>
+          </motion.div>
         </Col>
 
-        <Col xs={24} md={6}>
-          <Title level={4} style={{ color: "#00FFD1", fontWeight: 600 }}>
-            Quick Links
-          </Title>
-          <Space direction="vertical">
-            <Button type="link" href="/" style={{ color: "#E0E0E0" }}>
-              Home
-            </Button>
-            <Button type="link" href="/about" style={{ color: "#E0E0E0" }}>
-              About
-            </Button>
-            <Button type="link" href="/contact" style={{ color: "#E0E0E0" }}>
-              Contact
-            </Button>
-            <Button type="link" href="/login" style={{ color: "#E0E0E0" }}>
-              Login
-            </Button>
-          </Space>
-        </Col>
-
-        <Col xs={24} md={6}>
-          <Title level={4} style={{ color: "#00FFD1", fontWeight: 600 }}>
-            Follow Us
-          </Title>
-          <Space size="middle">
-            {socialLinks.map((social, index) => (
+        <Col xs={24} sm={12} md={8}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <Title level={4} style={{ color: "#00FFD1", fontWeight: 600, marginBottom: 20 }}>
+              <CodeOutlined style={{ marginRight: 10 }} />
+              Quick Links
+            </Title>
+            <Space direction="vertical" size="small" style={{ width: "100%" }}>
+              {[
+                { label: "Home", id: "home" },
+                { label: "About", id: "about" },
+                { label: "Contact", id: "contact" },
+              ].map((item) => (
+                <motion.div
+                  key={item.id}
+                  whileHover={{ x: 5 }}
+                  transition={{ type: "spring", stiffness: 300 }}
+                >
+                  <Button
+                    type="link"
+                    onClick={() => scrollToSection(item.id)}
+                    style={{
+                      color: "#E0E0E0",
+                      padding: "8px 0",
+                      height: "auto",
+                      textAlign: "left",
+                      display: "block",
+                    }}
+                    onMouseEnter={(e) => (e.target.style.color = "#00FFD1")}
+                    onMouseLeave={(e) => (e.target.style.color = "#E0E0E0")}
+                  >
+                    {item.label}
+                  </Button>
+                </motion.div>
+              ))}
               <motion.div
-                key={index}
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ x: 5 }}
+                transition={{ type: "spring", stiffness: 300 }}
+                style={{ marginTop: 10 }}
               >
                 <Button
-                  type="text"
-                  href={social.url}
-                  target="_blank"
-                  icon={social.icon}
+                  type="primary"
+                  onClick={navigateToLogin}
                   style={{
-                    background: social.color,
-                    color: "#fff",
-                    borderRadius: "50%",
-                    width: 40,
-                    height: 40,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    padding: 0,
+                    background: "linear-gradient(90deg, #00FFD1 0%, #3A7BD5 100%)",
+                    color: "#1F2937",
+                    fontWeight: 600,
+                    border: "none",
+                    borderRadius: 6,
+                    marginTop: 10,
                   }}
-                />
+                >
+                  Login
+                </Button>
               </motion.div>
-            ))}
-          </Space>
+            </Space>
+          </motion.div>
+        </Col>
+
+        <Col xs={24} sm={12} md={8}>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <Title level={4} style={{ color: "#00FFD1", fontWeight: 600, marginBottom: 20 }}>
+              <TeamOutlined style={{ marginRight: 10 }} />
+              Get Started
+            </Title>
+            <Space direction="vertical" size="middle">
+              <Text style={{ color: "#E0E0E0" }}>
+                Ready to transform your teaching or learning experience?
+              </Text>
+              <Space>
+                <Button
+                  type="primary"
+                  size="large"
+                  style={{
+                    background: "linear-gradient(90deg, #00FFD1 0%, #3A7BD5 100%)",
+                    color: "#1F2937",
+                    fontWeight: 600,
+                    border: "none",
+                  }}
+                  onClick={navigateToLogin}
+                >
+                  I'm an Instructor
+                </Button>
+                <Button
+                  size="large"
+                  style={{
+                    background: "transparent",
+                    color: "#00FFD1",
+                    borderColor: "#00FFD1",
+                    fontWeight: 500,
+                  }}
+                  onClick={navigateToLogin}
+                >
+                  I'm a Student
+                </Button>
+              </Space>
+            </Space>
+          </motion.div>
         </Col>
       </Row>
 
-      <div
+      <motion.div
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
         style={{
           marginTop: 60,
-          borderTop: "1px solid rgba(255,255,255,0.1)",
+          borderTop: "1px solid rgba(0, 255, 209, 0.2)",
           paddingTop: 24,
           textAlign: "center",
           color: "#999",
           fontSize: "0.9rem",
         }}
       >
-        © {new Date().getFullYear()} Insurely. All rights reserved.
-      </div>
+        © {new Date().getFullYear()} EvalAI. All rights reserved.
+      </motion.div>
     </Footer>
   );
 };
