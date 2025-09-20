@@ -18,25 +18,41 @@ import {
   EnvironmentOutlined,
   SendOutlined,
   UserOutlined,
-  MessageOutlined,
+  BookOutlined,
+  TeamOutlined,
   LinkedinOutlined,
   TwitterOutlined,
   GithubOutlined,
-  BookOutlined,
-  CodeOutlined,
-  TeamOutlined,
 } from "@ant-design/icons";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase/firebase"; // Adjust the path to your firebase config
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const Contact = () => {
   const [form] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = React.useState(false);
 
-  const onFinish = (values) => {
-    console.log("Received values:", values);
-    messageApi.success("Message sent successfully!");
-    form.resetFields();
+  const onFinish = async (values) => {
+    setLoading(true);
+    try {
+      // Add a new document with a generated id
+      const docRef = await addDoc(collection(db, "contactSubmissions"), {
+        ...values,
+        createdAt: serverTimestamp(),
+        status: "new",
+      });
+      
+      console.log("Document written with ID: ", docRef.id);
+      messageApi.success("Message sent successfully! We'll get back to you soon.");
+      form.resetFields();
+    } catch (error) {
+      console.error("Error adding document: ", error);
+      messageApi.error("Failed to send message. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const contactMethods = [
@@ -245,7 +261,7 @@ const Contact = () => {
                     >
                       <Input
                         prefix={<TeamOutlined style={{ color: "#00FFD1" }} />}
-                        placeholder="Your Role (Instructor/Student)"
+                        placeholder="Your Role (Instructor/Student/Admin)"
                         size="large"
                         style={{
                           padding: "12px 16px",
@@ -282,6 +298,7 @@ const Contact = () => {
                           htmlType="submit"
                           icon={<SendOutlined />}
                           size="large"
+                          loading={loading}
                           style={{
                             background: "linear-gradient(90deg, #00FFD1 0%, #3A7BD5 100%)",
                             color: "#1F2937",
@@ -295,7 +312,7 @@ const Contact = () => {
                             boxShadow: "0 4px 15px rgba(0, 255, 209, 0.3)",
                           }}
                         >
-                          Send Message
+                          {loading ? "Sending..." : "Send Message"}
                         </Button>
                       </motion.div>
                     </Form.Item>
@@ -331,7 +348,7 @@ const Contact = () => {
                         alignItems: "center",
                         justifyContent: "center",
                       }}>
-                        <CodeOutlined style={{ color: "#1F2937", fontSize: 18, fontWeight: "bold" }} />
+                        <SendOutlined style={{ color: "#1F2937", fontSize: 18, fontWeight: "bold" }} />
                       </div>
                       <Title level={3} style={{ color: "#FFFFFF", fontWeight: 700, margin: 0 }}>
                         Contact Information
