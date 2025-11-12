@@ -27,7 +27,7 @@ import {
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase/firebase"; // Adjust the path to your firebase config
 
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const Contact = () => {
   const [form] = Form.useForm();
@@ -59,37 +59,37 @@ const Contact = () => {
     {
       icon: <MailOutlined style={{ fontSize: 24, color: "#00FFD1" }} />,
       title: "Email Us",
-      content: "support@evalai.com",
-      action: "mailto:support@evalai.com",
+      content: "support@civicgpt.com",
+      action: "mailto:support@civicgpt.com",
     },
     {
       icon: <PhoneOutlined style={{ fontSize: 24, color: "#00FFD1" }} />,
       title: "Call Us",
-      content: "+1 (555) 123-EDU1",
-      action: "tel:+15551233831",
+      content: "+91 98765 43210",
+      action: "tel:+919876543210",
     },
     {
       icon: <EnvironmentOutlined style={{ fontSize: 24, color: "#00FFD1" }} />,
       title: "Visit Us",
-      content: "456 Education Hub, San Francisco, CA",
-      action: "https://maps.google.com",
+      content: "Tech Park, Whitefield, Bangalore, Karnataka - 560066",
+      action: "https://maps.google.com/?q=Whitefield+Bangalore",
     },
   ];
 
   const socialLinks = [
     {
       icon: <LinkedinOutlined style={{ fontSize: 20 }} />,
-      url: "https://linkedin.com/company/evalai",
+      url: "https://linkedin.com/company/civicgpt",
       color: "#0A66C2",
     },
     {
       icon: <TwitterOutlined style={{ fontSize: 20 }} />,
-      url: "https://twitter.com/evalai",
+      url: "https://twitter.com/civicgpt",
       color: "#1DA1F2",
     },
     {
       icon: <GithubOutlined style={{ fontSize: 20 }} />,
-      url: "https://github.com/evalai",
+      url: "https://github.com/civicgpt",
       color: "#333",
     },
   ];
@@ -148,7 +148,7 @@ const Contact = () => {
                 fontSize: "2.8rem",
               }}
             >
-              Let's Transform Education Together
+              Need Help With Your Taxes?
             </Title>
             <Text
               style={{
@@ -161,7 +161,8 @@ const Contact = () => {
                 lineHeight: 1.6,
               }}
             >
-              Ready to revolutionize how you evaluate projects? Our team is here to help you implement AI-powered assessment in your institution.
+              Have questions about tax saving strategies or understanding government policies? 
+              Our tax experts are here to help you maximize your savings and understand complex tax rules.
             </Text>
           </div>
 
@@ -200,7 +201,7 @@ const Contact = () => {
                       </Title>
                     </div>
                     <Text style={{ color: "#4A5568", fontSize: "1rem" }}>
-                      Have questions about integrating EvalAI into your curriculum? We're here to help.
+                      Have questions about tax saving options or understanding government policies? We're here to help.
                     </Text>
                   </Space>
 
@@ -211,7 +212,7 @@ const Contact = () => {
                     >
                       <Input
                         prefix={<UserOutlined style={{ color: "#00FFD1" }} />}
-                        placeholder="Your Name"
+                        placeholder="Your Full Name"
                         size="large"
                         style={{
                           padding: "12px 16px",
@@ -231,7 +232,7 @@ const Contact = () => {
                       <Input
                         prefix={<MailOutlined style={{ color: "#00FFD1" }} />}
                         type="email"
-                        placeholder="Your Email"
+                        placeholder="Your Email Address"
                         size="large"
                         style={{
                           padding: "12px 16px",
@@ -242,11 +243,26 @@ const Contact = () => {
                     </Form.Item>
 
                     <Form.Item
-                      name="institution"
+                      name="phone"
+                    >
+                      <Input
+                        prefix={<PhoneOutlined style={{ color: "#00FFD1" }} />}
+                        placeholder="Your Phone Number (Optional)"
+                        size="large"
+                        style={{
+                          padding: "12px 16px",
+                          borderRadius: 10,
+                          borderColor: "#E2E8F0",
+                        }}
+                      />
+                    </Form.Item>
+
+                    <Form.Item
+                      name="occupation"
                     >
                       <Input
                         prefix={<BookOutlined style={{ color: "#00FFD1" }} />}
-                        placeholder="Your Institution (Optional)"
+                        placeholder="Your Occupation (e.g., Software Engineer, Business Owner)"
                         size="large"
                         style={{
                           padding: "12px 16px",
@@ -257,11 +273,11 @@ const Contact = () => {
                     </Form.Item>
 
                     <Form.Item
-                      name="role"
+                      name="annualIncome"
                     >
                       <Input
                         prefix={<TeamOutlined style={{ color: "#00FFD1" }} />}
-                        placeholder="Your Role (Instructor/Student/Admin)"
+                        placeholder="Annual Income Range (Optional)"
                         size="large"
                         style={{
                           padding: "12px 16px",
@@ -277,7 +293,7 @@ const Contact = () => {
                     >
                       <Input.TextArea
                         rows={5}
-                        placeholder="Tell us about your project evaluation needs..."
+                        placeholder="Tell us about your tax questions or the government policies you need help understanding..."
                         style={{
                           padding: "12px 16px",
                           borderRadius: 10,
@@ -312,7 +328,7 @@ const Contact = () => {
                             boxShadow: "0 4px 15px rgba(0, 255, 209, 0.3)",
                           }}
                         >
-                          {loading ? "Sending..." : "Send Message"}
+                          {loading ? "Sending..." : "Get Tax Advice"}
                         </Button>
                       </motion.div>
                     </Form.Item>
@@ -355,7 +371,7 @@ const Contact = () => {
                       </Title>
                     </div>
                     <Text style={{ color: "#E0E0E0", fontSize: "1rem" }}>
-                      Multiple ways to reach our education technology specialists.
+                      Multiple ways to reach our tax experts and financial advisors.
                     </Text>
                   </Space>
 
@@ -419,10 +435,10 @@ const Contact = () => {
 
                   <Space direction="vertical" size="middle" style={{ width: "100%" }}>
                     <Title level={4} style={{ color: "#FFFFFF", fontWeight: 600, margin: 0 }}>
-                      Follow Our Journey
+                      Follow Our Updates
                     </Title>
                     <Text style={{ color: "#E0E0E0", fontSize: "1rem" }}>
-                      Stay updated with the latest in AI-powered education assessment.
+                      Stay updated with the latest tax rules, government policies, and money-saving tips.
                     </Text>
                     
                     <Space size={16}>

@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 const firebaseConfig = {
-  apiKey: "AIzaSyAH25lXVxOIVKL_wdZ0eGFmdhkT-kNP93c",
-  authDomain: "evalai-bc473.firebaseapp.com",
-  projectId: "evalai-bc473",
-  storageBucket: "evalai-bc473.firebasestorage.app",
-  messagingSenderId: "149356729453",
-  appId: "1:149356729453:web:a00f4ca90e62c640f6db64"
+  apiKey: "AIzaSyAU-meaR5MZQDIa-wVqaKhE8-SQWkE0Lv8",
+  authDomain: "civicgpt-37e2b.firebaseapp.com",
+  projectId: "civicgpt-37e2b",
+  storageBucket: "civicgpt-37e2b.firebasestorage.app",
+  messagingSenderId: "376178763239",
+  appId: "1:376178763239:web:a74441fa848a88472bc942"
 };
 
 const app = initializeApp(firebaseConfig);

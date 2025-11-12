@@ -18,22 +18,22 @@ const FooterSection = () => {
   const socialLinks = [
     {
       icon: <LinkedinOutlined />,
-      url: "https://linkedin.com/company/evalai",
+      url: "https://linkedin.com/company/civicgpt",
       color: "#0A66C2",
     },
     {
       icon: <TwitterOutlined />,
-      url: "https://twitter.com/evalai",
+      url: "https://twitter.com/civicgpt",
       color: "#1DA1F2",
     },
     {
       icon: <GithubOutlined />,
-      url: "https://github.com/evalai",
+      url: "https://github.com/civicgpt",
       color: "#000000",
     },
     {
       icon: <MailOutlined />,
-      url: "mailto:support@evalai.com",
+      url: "mailto:support@civicgpt.com",
       color: "#FFB703",
     },
   ];
@@ -79,12 +79,12 @@ const FooterSection = () => {
                 }}
               >
                 <RocketOutlined />
-                EvalAI
+                CivicGPT
               </Title>
               <Text style={{ color: "#E0E0E0", lineHeight: 1.6 }}>
-                From Coursework to Capstone: AI-Powered Project Evaluation. 
-                Generate meaningful projects and receive instant, expert-level feedback. 
-                Scale hands-on learning like never before.
+                Your AI-powered tax assistant that simplifies complex government policies. 
+                Upload your payslip and tax documents to get personalized tax saving advice 
+                in simple language you can understand.
               </Text>
               <Space size="middle" style={{ marginTop: 16 }}>
                 {socialLinks.map((social, index) => (
@@ -173,7 +173,7 @@ const FooterSection = () => {
                     marginTop: 10,
                   }}
                 >
-                  Login
+                  Get Started
                 </Button>
               </motion.div>
             </Space>
@@ -188,11 +188,11 @@ const FooterSection = () => {
           >
             <Title level={4} style={{ color: "#00FFD1", fontWeight: 600, marginBottom: 20 }}>
               <TeamOutlined style={{ marginRight: 10 }} />
-              Get Started
+              Start Saving Tax
             </Title>
             <Space direction="vertical" size="middle">
               <Text style={{ color: "#E0E0E0" }}>
-                Ready to transform your teaching or learning experience?
+                Ready to understand your taxes better and save money legally?
               </Text>
               <Space>
                 <Button
@@ -206,7 +206,7 @@ const FooterSection = () => {
                   }}
                   onClick={navigateToLogin}
                 >
-                  I'm an Instructor
+                  Upload Documents
                 </Button>
                 <Button
                   size="large"
@@ -218,7 +218,7 @@ const FooterSection = () => {
                   }}
                   onClick={navigateToLogin}
                 >
-                  I'm a Student
+                  See Demo
                 </Button>
               </Space>
             </Space>
@@ -239,7 +239,7 @@ const FooterSection = () => {
           fontSize: "0.9rem",
         }}
       >
-        © {new Date().getFullYear()} EvalAI. All rights reserved.
+        © {new Date().getFullYear()} CivicGPT. All rights reserved.
       </motion.div>
     </Footer>
   );

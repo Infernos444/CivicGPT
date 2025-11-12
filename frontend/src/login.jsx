@@ -7,12 +7,8 @@ import {
   Divider,
   Card,
   message,
-  Select,
-  Upload,
   Modal,
-  Steps,
-  Row,
-  Col
+  Steps
 } from "antd";
 import {
   MailOutlined,
@@ -20,12 +16,10 @@ import {
   EyeInvisibleOutlined,
   EyeTwoTone,
   UserOutlined,
-  IdcardOutlined,
-  BookOutlined,
-  TeamOutlined,
   ArrowLeftOutlined,
-  UploadOutlined,
-  HomeOutlined
+  HomeOutlined,
+  BankOutlined,
+  IdcardOutlined
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -37,64 +31,37 @@ import {
 import {
   doc,
   setDoc,
-  getDoc,
   serverTimestamp
 } from "firebase/firestore";
-import {
-  ref,
-  uploadBytes,
-  getDownloadURL
-} from "firebase/storage";
-import { auth, db, storage } from "./firebase/firebase";
+import { auth, db } from "./firebase/firebase";
 
 const { Title, Text } = Typography;
-const { Option } = Select;
 const { Step } = Steps;
 
 const Login = () => {
   const [form] = Form.useForm();
+  const [registerForm] = Form.useForm();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isRegisterModalVisible, setIsRegisterModalVisible] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
-  const [userType, setUserType] = useState("student");
-  const [idProof, setIDProof] = useState(null);
-  const [idProofUploading, setIdProofUploading] = useState(false);
+  const [stepOneData, setStepOneData] = useState(null);
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
       // Sign in the user
-      const userCredential = await signInWithEmailAndPassword(
+      await signInWithEmailAndPassword(
         auth, 
         values.email, 
         values.password
       );
       
-      const user = userCredential.user;
+      message.success("Login successful!");
       
-      // Get user data from Firestore to determine user type
-      const userDoc = await getDoc(doc(db, "users", user.uid));
+      // Redirect to dashboard
+      navigate("/dashboard");
       
-      if (userDoc.exists()) {
-        const userData = userDoc.data();
-        const userType = userData.userType;
-        
-        message.success("Login successful!");
-        
-        // Redirect based on user type
-        if (userType === "student") {
-          navigate("/student-dashboard");
-        } else if (userType === "faculty") {
-          navigate("/faculty-dashboard");
-        } else {
-          // Default fallback
-          navigate("/dashboard");
-        }
-      } else {
-        message.error("User data not found. Please contact support.");
-        console.error("User document does not exist in Firestore");
-      }
     } catch (error) {
       console.error("Login error:", error);
       message.error(error.message || "Login failed");
@@ -105,69 +72,60 @@ const Login = () => {
 
   const handleRegister = () => {
     setIsRegisterModalVisible(true);
+    setStepOneData(null);
+    setCurrentStep(0);
+    registerForm.resetFields();
   };
 
   const handleRegisterCancel = () => {
     setIsRegisterModalVisible(false);
     setCurrentStep(0);
-    setUserType("student");
-    setIDProof(null);
+    setStepOneData(null);
+    registerForm.resetFields();
   };
 
   const handleBackToHome = () => {
     navigate("/");
   };
 
+  const handleStepOneFinish = (values) => {
+    setStepOneData(values);
+    setCurrentStep(1);
+  };
+
   const handleRegisterSubmit = async (values) => {
     setLoading(true);
     try {
+      // Combine data from both steps
+      const allData = {
+        ...stepOneData,
+        ...values
+      };
+
       // Create user with email and password
       const userCredential = await createUserWithEmailAndPassword(
         auth, 
-        values.email, 
-        values.password
+        allData.email, 
+        allData.password
       );
       
       const user = userCredential.user;
       
       // Update user profile with name
       await updateProfile(user, {
-        displayName: values.name
+        displayName: allData.name
       });
       
       // Prepare user data for Firestore
       const userData = {
         uid: user.uid,
         email: user.email,
-        displayName: values.name,
-        userType: userType,
+        displayName: allData.name,
+        userType: "taxpayer", // All users are taxpayers
+        occupation: allData.occupation,
+        panNumber: allData.panNumber || "",
         createdAt: serverTimestamp()
       };
-      
-      // Add user type specific data
-      if (userType === 'student') {
-        userData.studentId = values.studentId;
-      } else if (userType === 'faculty') {
-        userData.institution = values.institution;
-        userData.department = values.department;
-        userData.facultyId = values.facultyId;
-        userData.verified = false; // Faculty needs verification
-        
-        // Upload ID proof if available
-        if (idProof) {
-          try {
-            setIdProofUploading(true);
-            const idProofUrl = await uploadIDProof(user.uid, idProof);
-            userData.idProofUrl = idProofUrl;
-            message.success("ID proof uploaded successfully!");
-          } catch (uploadError) {
-            console.error("ID proof upload error:", uploadError);
-            message.warning("User created but ID proof upload failed. Please upload it later.");
-          } finally {
-            setIdProofUploading(false);
-          }
-        }
-      }
       
       // Save user data to Firestore
       await setDoc(doc(db, "users", user.uid), userData);
@@ -177,8 +135,8 @@ const Login = () => {
       // Reset form and close modal
       setIsRegisterModalVisible(false);
       setCurrentStep(0);
-      setUserType("student");
-      setIDProof(null);
+      setStepOneData(null);
+      registerForm.resetFields();
       
     } catch (error) {
       console.error("Registration error:", error);
@@ -188,140 +146,28 @@ const Login = () => {
     }
   };
 
-  const uploadIDProof = async (userId, file) => {
-    try {
-      // Create a storage reference
-      const storageRef = ref(storage, `id-proofs/${userId}/${file.name}`);
-      
-      // Upload the file
-      const snapshot = await uploadBytes(storageRef, file);
-      
-      // Get the download URL
-      const downloadURL = await getDownloadURL(snapshot.ref);
-      
-      return downloadURL;
-    } catch (error) {
-      console.error("Error uploading ID proof:", error);
-      throw error;
-    }
+  const handleForgotPassword = () => {
+    message.info("Password reset functionality would be implemented here");
   };
 
-  const handleIDProofUpload = (info) => {
-    const { file } = info;
-    
-    if (file.status === 'uploading') {
-      setIdProofUploading(true);
-      return;
-    }
-    
-    if (file.status === 'done') {
-      setIDProof(file.originFileObj);
-      setIdProofUploading(false);
-      message.success(`${file.name} file uploaded successfully`);
-    } else if (file.status === 'error') {
-      setIdProofUploading(false);
-      message.error(`${file.name} file upload failed.`);
-    }
+  const handleTermsClick = () => {
+    message.info("Terms of Service would be shown here");
   };
 
-  const beforeUpload = (file) => {
-    const isJpgOrPng = file.type === 'image/jpeg' || 
-                       file.type === 'image/png' || 
-                       file.type === 'application/pdf';
-    
-    if (!isJpgOrPng) {
-      message.error('You can only upload JPG, PNG, or PDF files!');
-      return Upload.LIST_IGNORE;
-    }
-    
-    const isLt5M = file.size / 1024 / 1024 < 5;
-    if (!isLt5M) {
-      message.error('File must be smaller than 5MB!');
-      return Upload.LIST_IGNORE;
-    }
-    
-    return true;
-  };
-
-  const customUploadRequest = ({ file, onSuccess, onError }) => {
-    // Simulate upload process
-    setTimeout(() => {
-      onSuccess("ok");
-    }, 1000);
+  const handlePrivacyClick = () => {
+    message.info("Privacy Policy would be shown here");
   };
 
   const renderRegisterSteps = () => {
     const steps = [
       {
-        title: 'Select Role',
-        content: (
-          <div style={{ textAlign: 'center', padding: '20px 0' }}>
-            <Title level={4}>I am a...</Title>
-            <Row gutter={[16, 16]} style={{ marginTop: '20px' }}>
-              <Col span={12}>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Card 
-                    hoverable 
-                    style={{ 
-                      border: userType === 'student' ? '2px solid #722ed1' : '1px solid #d9d9d9',
-                      borderRadius: '8px',
-                      height: '120px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                    }}
-                    onClick={() => setUserType('student')}
-                  >
-                    <TeamOutlined style={{ fontSize: '32px', color: '#722ed1', marginBottom: '10px' }} />
-                    <Text strong>Student</Text>
-                  </Card>
-                </motion.div>
-              </Col>
-              <Col span={12}>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Card 
-                    hoverable 
-                    style={{ 
-                      border: userType === 'faculty' ? '2px solid #1890ff' : '1px solid #d9d9d9',
-                      borderRadius: '8px',
-                      height: '120px',
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'center',
-                      alignItems: 'center'
-                    }}
-                    onClick={() => setUserType('faculty')}
-                  >
-                    <UserOutlined style={{ fontSize: '32px', color: '#1890ff', marginBottom: '10px' }} />
-                    <Text strong>Faculty</Text>
-                  </Card>
-                </motion.div>
-              </Col>
-            </Row>
-            <Button 
-              type="primary" 
-              style={{ marginTop: '30px' }} 
-              onClick={() => setCurrentStep(1)}
-              disabled={!userType}
-            >
-              Continue
-            </Button>
-          </div>
-        )
-      },
-      {
-        title: 'Account Details',
+        title: 'Personal Info',
         content: (
           <Form
+            form={registerForm}
             layout="vertical"
-            onFinish={(values) => {
-              if (userType === 'faculty') {
-                setCurrentStep(2);
-              } else {
-                handleRegisterSubmit(values);
-              }
-            }}
+            onFinish={handleStepOneFinish}
+            initialValues={stepOneData || {}}
           >
             <Form.Item
               name="name"
@@ -340,6 +186,47 @@ const Login = () => {
               ]}
             >
               <Input prefix={<MailOutlined />} placeholder="Email address" />
+            </Form.Item>
+            
+            <Form.Item
+              name="occupation"
+              label="Occupation"
+              rules={[{ required: true, message: 'Please input your occupation!' }]}
+            >
+              <Input prefix={<BankOutlined />} placeholder="e.g., Software Engineer, Business Owner, etc." />
+            </Form.Item>
+            
+            <Form.Item>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                block
+              >
+                Continue
+              </Button>
+            </Form.Item>
+          </Form>
+        )
+      },
+      {
+        title: 'Account Security',
+        content: (
+          <Form
+            layout="vertical"
+            onFinish={handleRegisterSubmit}
+            initialValues={{ panNumber: stepOneData?.panNumber || '' }}
+          >
+            <Form.Item
+              name="panNumber"
+              label="PAN Number (Optional)"
+              rules={[
+                {
+                  pattern: /[A-Z]{5}[0-9]{4}[A-Z]{1}/,
+                  message: 'Please enter a valid PAN number!'
+                }
+              ]}
+            >
+              <Input prefix={<IdcardOutlined />} placeholder="ABCDE1234F" />
             </Form.Item>
             
             <Form.Item
@@ -380,16 +267,6 @@ const Login = () => {
               />
             </Form.Item>
             
-            {userType === 'student' && (
-              <Form.Item
-                name="studentId"
-                label="Student ID"
-                rules={[{ required: true, message: 'Please input your student ID!' }]}
-              >
-                <Input prefix={<IdcardOutlined />} placeholder="Student ID" />
-              </Form.Item>
-            )}
-            
             <Form.Item>
               <Button 
                 type="primary" 
@@ -397,80 +274,7 @@ const Login = () => {
                 block
                 loading={loading}
               >
-                {userType === 'faculty' ? 'Continue to Verification' : 'Register'}
-              </Button>
-            </Form.Item>
-          </Form>
-        )
-      },
-      {
-        title: 'Faculty Verification',
-        content: (
-          <Form
-            layout="vertical"
-            onFinish={handleRegisterSubmit}
-          >
-            <Form.Item
-              name="institution"
-              label="Institution"
-              rules={[{ required: true, message: 'Please input your institution!' }]}
-            >
-              <Input prefix={<BookOutlined />} placeholder="University/College name" />
-            </Form.Item>
-            
-            <Form.Item
-              name="department"
-              label="Department"
-              rules={[{ required: true, message: 'Please select your department!' }]}
-            >
-              <Select placeholder="Select your department">
-                <Option value="cs">Computer Science</Option>
-                <Option value="ece">Electrical & Computer Engineering</Option>
-                <Option value="math">Mathematics</Option>
-                <Option value="physics">Physics</Option>
-                <Option value="other">Other</Option>
-              </Select>
-            </Form.Item>
-            
-            <Form.Item
-              name="facultyId"
-              label="Faculty ID"
-              rules={[{ required: true, message: 'Please input your faculty ID!' }]}
-            >
-              <Input prefix={<IdcardOutlined />} placeholder="Faculty ID" />
-            </Form.Item>
-            
-            <Form.Item
-              name="idProof"
-              label="Proof of Faculty Status"
-              rules={[{ required: true, message: 'Please upload proof of faculty status!' }]}
-              extra="Upload a photo of your faculty ID, official letter, or other proof"
-            >
-              <Upload
-                name="idProof"
-                listType="picture"
-                beforeUpload={beforeUpload}
-                onChange={handleIDProofUpload}
-                maxCount={1}
-                customRequest={customUploadRequest}
-              >
-                <Button 
-                  icon={<UploadOutlined />} 
-                  loading={idProofUploading}
-                >
-                  Click to upload
-                </Button>
-              </Upload>
-            </Form.Item>
-            
-            <Form.Item>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                block 
-                loading={loading}
-              >
-                Complete Registration
+                Create Account
               </Button>
             </Form.Item>
           </Form>
@@ -490,13 +294,13 @@ const Login = () => {
                 style={{ marginRight: '8px' }}
               />
             )}
-            <span>Register for EvanAI</span>
+            <span>Join CivicGPT</span>
           </div>
         }
-        visible={isRegisterModalVisible}
+        open={isRegisterModalVisible}
         onCancel={handleRegisterCancel}
         footer={null}
-        width={600}
+        width={500}
         centered
       >
         <Steps current={currentStep} style={{ marginBottom: '24px' }}>
@@ -577,16 +381,16 @@ const Login = () => {
               <Title
                 level={2}
                 style={{
-                  color: "#722ed1",
+                  color: "#00FFD1",
                   marginBottom: "8px",
                   fontWeight: 700,
-                  background: "linear-gradient(135deg, #722ed1 0%, #1890ff 100%)",
+                  background: "linear-gradient(135deg, #00FFD1 0%, #3A7BD5 100%)",
                   backgroundClip: "text",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                 }}
               >
-                EvanAI
+                CivicGPT
               </Title>
             </motion.div>
             <Text
@@ -595,7 +399,7 @@ const Login = () => {
                 fontSize: "16px",
               }}
             >
-              AI-Powered Project Evaluation System
+              Your AI-Powered Tax Assistant
             </Text>
           </div>
 
@@ -636,7 +440,7 @@ const Login = () => {
                 placeholder="Password"
                 iconRender={(visible) =>
                   visible ? (
-                    <EyeTwoTone style={{ color: "#722ed1" }} />
+                    <EyeTwoTone style={{ color: "#00FFD1" }} />
                   ) : (
                     <EyeInvisibleOutlined style={{ color: "rgba(0, 0, 0, 0.45)" }} />
                   )
@@ -656,12 +460,12 @@ const Login = () => {
                 block
                 style={{
                   height: "48px",
-                  background: "linear-gradient(135deg, #722ed1 0%, #1890ff 100%)",
+                  background: "linear-gradient(135deg, #00FFD1 0%, #3A7BD5 100%)",
                   border: "none",
                   borderRadius: "8px",
                   fontWeight: 600,
                   fontSize: "16px",
-                  color: "#fff",
+                  color: "#1F2937",
                   marginTop: "8px",
                 }}
               >
@@ -671,12 +475,13 @@ const Login = () => {
           </Form>
 
           <div style={{ textAlign: "right", marginBottom: "24px" }}>
-            <a
-              onClick={() => message.info("Password reset functionality would be implemented here")}
-              style={{ color: "#1890ff", cursor: "pointer" }}
+            <Button
+              type="link"
+              onClick={handleForgotPassword}
+              style={{ color: "#1890ff", padding: 0, height: "auto" }}
             >
               Forgot password?
-            </a>
+            </Button>
           </div>
 
           <Divider
@@ -685,7 +490,7 @@ const Login = () => {
               color: "rgba(0, 0, 0, 0.45)",
             }}
           >
-            New to EvanAI?
+            New to CivicGPT?
           </Divider>
 
           <Button
@@ -695,29 +500,34 @@ const Login = () => {
             style={{
               height: "48px",
               background: "rgba(255, 255, 255, 0.9)",
-              borderColor: "#d9d9d9",
-              color: "#595959",
-              borderRadius: "8px",
-              fontWeight: 500,
-              fontSize: "16px",
-            }}
-          >
-            Create an Account
-          </Button>
+                  borderColor: "#d9d9d9",
+                  color: "#595959",
+                  borderRadius: "8px",
+                  fontWeight: 500,
+                  fontSize: "16px",
+                }}
+              >
+                Create an Account
+              </Button>
 
-          <div style={{ textAlign: "center", marginTop: "24px" }}>
-            <Text style={{ color: "rgba(0, 0, 0, 0.45)" }}>
-              By continuing, you agree to EvanAI's{" "}
-              <a style={{ color: "#1890ff" }}>Terms of Service</a> and{" "}
-              <a style={{ color: "#1890ff" }}>Privacy Policy</a>
-            </Text>
-          </div>
-        </Card>
-      </motion.div>
-      
-      {renderRegisterSteps()}
-    </div>
-  );
-};
+              <div style={{ textAlign: "center", marginTop: "24px" }}>
+                <Text style={{ color: "rgba(0, 0, 0, 0.45)" }}>
+                  By continuing, you agree to CivicGPT's{" "}
+                  <Button type="link" onClick={handleTermsClick} style={{ padding: 0, height: "auto" }}>
+                    Terms of Service
+                  </Button>{" "}
+                  and{" "}
+                  <Button type="link" onClick={handlePrivacyClick} style={{ padding: 0, height: "auto" }}>
+                    Privacy Policy
+                  </Button>
+                </Text>
+              </div>
+            </Card>
+          </motion.div>
+          
+          {renderRegisterSteps()}
+        </div>
+      );
+    };
 
-export default Login;
+    export default Login;

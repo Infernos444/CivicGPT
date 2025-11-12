@@ -68,7 +68,7 @@ const Navbar = () => {
               borderRadius: "50%",
               background: "linear-gradient(135deg, #00FFD1 0%, #3A7BD5 100%)",
             }} />
-            EvalAI
+            CivicGPT
           </motion.div>
 
           <div className="nav-links" style={{ display: "flex", gap: 8 }}>
@@ -181,7 +181,7 @@ const Navbar = () => {
               fontWeight: "bold",
               fontFamily: "Poppins, sans-serif",
             }}>
-              EvalAI
+              CivicGPT
             </div>
             <motion.div
               whileHover={{ scale: 1.1 }}
