@@ -20,7 +20,6 @@ It reads **official Finance Act PDFs** and **personal payslips**, then explains 
 
 ## 🧩 Tech Architecture  
 
-```mermaid
 flowchart TD
     A[User Uploads Payslip + Policy PDF] --> B[OCR Layer (Tesseract / PyMuPDF)]
     B --> C[Text Cleaning & Chunking]
