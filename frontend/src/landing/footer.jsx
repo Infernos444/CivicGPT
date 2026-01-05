@@ -239,7 +239,7 @@ const FooterSection = () => {
           fontSize: "0.9rem",
         }}
       >
-        © {new Date().getFullYear()} CivicGPT. All rights reservedd.
+        © {new Date().getFullYear()} CivicGPT. All rights reserved.
       </motion.div>
     </Footer>
   );
