@@ -3,12 +3,12 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 const firebaseConfig = {
-  apiKey: "AIzaSyAU-meaR5MZQDIa-wVqaKhE8-SQWkE0Lv8",
-  authDomain: "civicgpt-37e2b.firebaseapp.com",
-  projectId: "civicgpt-37e2b",
-  storageBucket: "civicgpt-37e2b.firebasestorage.app",
-  messagingSenderId: "376178763239",
-  appId: "1:376178763239:web:a74441fa848a88472bc942"
+  apiKey: "AIzaSyAkHCIepZPdakIwJXKUh_UyppmP1Y62Qcc",
+  authDomain: "civicgpt-b45f9.firebaseapp.com",
+  projectId: "civicgpt-b45f9",
+  storageBucket: "civicgpt-b45f9.firebasestorage.app",
+  messagingSenderId: "108576384930",
+  appId: "1:108576384930:web:fb4db1984ccaf7a4f234fb"
 };
 
 const app = initializeApp(firebaseConfig);
